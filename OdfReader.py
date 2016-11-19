@@ -106,7 +106,7 @@ class OdfReader:
     def __convertRowToXml(self, row):
         offsetLp = 34+4
         offsetAusbildung = offsetLp + 12 + 7
-        offsetVerfügbarkeit = offsetAusbildung + 8 + 1
+        offsetVerfuegbarkeit = offsetAusbildung + 8 + 1
 
         ids = {0:"Nummer", 2:"aktivUeber18", 3:"aktivUnter18", 4:"maennlich", 5:"weiblich",
                7:"vereinAktiv", 9:"vereinPassiv", 11:"vereinFoerdernd",
@@ -115,7 +115,7 @@ class OdfReader:
                33:"eintrittAktiv", 34:"endeAktiv",
                offsetLp+1:"hl1", offsetLp+2:"hl2", offsetLp+3:"hl3", offsetLp+4: "hl4", offsetLp+5:"hl5", offsetLp+6:"hl6", offsetLp+7:"wa1", offsetLp+8:"wa2", offsetLp+9:"wa3", offsetLp+10:"wa4", offsetLp+11:"wa5", offsetLp+12:"wa6",
                offsetAusbildung+1:"ausbildungGA", offsetAusbildung+2:"ausbildungTM", offsetAusbildung+3:"ausbildungGF", offsetAusbildung+4:"ausbildungZF", offsetAusbildung+5:"ausbildungVF", offsetAusbildung+6:"ausbildungFunk", offsetAusbildung+7:"ausbildungMA", offsetAusbildung+8:"ausbildungAT",
-               offsetVerfügbarkeit+1:"verfWocheTag", offsetVerfügbarkeit+3:"verfWocheNacht", offsetVerfügbarkeit+5:"verfWochenendeTag", offsetVerfügbarkeit+7:"verWochenendeNacht"}
+               offsetVerfuegbarkeit+1:"verfWocheTag", offsetVerfuegbarkeit+3:"verfWocheNacht", offsetVerfuegbarkeit+5:"verfWochenendeTag", offsetVerfuegbarkeit+7:"verWochenendeNacht"}
 
         xml = "    <item>\n"
 
