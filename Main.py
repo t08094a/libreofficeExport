@@ -24,8 +24,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    input = os.path.abspath(args.input)
-    output = os.path.abspath(args.output)
+    input = os.path.abspath(os.path.expanduser(args.input))
+    output = os.path.abspath(os.path.expanduser(args.output))
 
     odfReader = OdfReader(input)
     xml = odfReader.parse()
