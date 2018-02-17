@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sys, argparse, os.path
 
 from OdfReader import OdfReader
@@ -7,11 +9,12 @@ def usage():
     sys.stderr.write("Usage: %s [-e] [-o outputfile] [inputfile]\n" % sys.argv[0])
 
 
-def isValidFile(parser, arg):
+def is_valid_file(parser, arg):
     if not os.path.isfile(arg):
         parser.error("The file %s does not exist!" % arg)
     else:
         return arg
+
 
 if __name__ == '__main__':
     """
@@ -19,7 +22,7 @@ if __name__ == '__main__':
     phrase as command line arguments. Use sys.argv[]
     """
     parser = argparse.ArgumentParser(description='Converts the Feuerwehr Mitglieder_aktuell.ods to an XML file')
-    parser.add_argument('-i', '--input', required=True, help='input ODS file', metavar='FILE', type=lambda x: isValidFile(parser, x))
+    parser.add_argument('-i', '--input', required=True, help='input ODS file', metavar='FILE', type=lambda x: is_valid_file(parser, x))
     parser.add_argument('-o', '--output', required=True, help='output filename of the XML target', metavar='FILE')
 
     args = parser.parse_args()
@@ -32,7 +35,4 @@ if __name__ == '__main__':
 
     with open(output, "w", encoding="utf-8") as f:
         f.write(xml)
-
-
-
 

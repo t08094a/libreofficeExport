@@ -3,16 +3,17 @@ from odf.table import TableRow
 from odf.text import P
 from odf.namespaces import *
 
+
 class OdfReader:
     m_TableKey = (TABLENS, 'name')
     m_ExpectedTableName = "Stammliste_aktuell"
 
-    def __init__(self, docFilename):
+    def __init__(self, doc_filename):
         """
         Open an ODF file.
         """
-        self.filename = docFilename
-        print("operate on: " + docFilename)
+        self.filename = doc_filename
+        print("operate on: " + doc_filename)
 
     def __validate(self, ods):
         """
@@ -20,123 +21,130 @@ class OdfReader:
         :param ods: the ods document
         :return: nothing
         """
-        childNodes = ods.spreadsheet.childNodes
+        child_nodes = ods.spreadsheet.childNodes
 
-        assert len(childNodes) > 0
-        attributes = childNodes[1].attributes
+        assert len(child_nodes) > 0
+        attributes = child_nodes[1].attributes
 
         exists = self.m_TableKey in attributes
         assert exists
 
-
-        tableName = attributes[self.m_TableKey]
-        assert tableName == self.m_ExpectedTableName
+        table_name = attributes[self.m_TableKey]
+        assert table_name == self.m_ExpectedTableName
 
         print("Found table: " + self.m_ExpectedTableName)
 
-    def __findStammlisteTable(self, ods):
+    def __find_stammliste_table(self, ods):
 
-        childNodes = ods.spreadsheet.childNodes
+        child_nodes = ods.spreadsheet.childNodes
 
-        for table in childNodes:
+        for table in child_nodes:
             if len(table.attributes) <= 0:
                 continue
 
             if self.m_TableKey not in table.attributes:
                 continue
 
-            tableName = table.attributes[self.m_TableKey]
+            table_name = table.attributes[self.m_TableKey]
 
-            if tableName != self.m_ExpectedTableName:
+            if table_name != self.m_ExpectedTableName:
                 continue
 
             return table
 
         return None
 
-    def __getRelevantRows(self, table):
+    def __get_relevant_rows(self, table):
         result = []
 
         rows = table.getElementsByType(TableRow)
         for row in rows:
-            isRelevant = self.__isCurrentRowRelevant(row)
+            is_relevant = self.__is_current_row_relevant(row)
 
-            if isRelevant:
+            if is_relevant:
                 print("    append row")
                 result.append(row)
 
-
         return result
 
-    def __isCurrentRowRelevant(self, row):
+    @staticmethod
+    def __is_current_row_relevant(row):
 
-        firstCell = row.firstChild
+        first_cell = row.firstChild
 
-        if firstCell is None:
+        if first_cell is None:
             return False
 
-        textElementList = firstCell.getElementsByType(P)
-        if len(textElementList) == 0 or len(textElementList[0].childNodes) == 0:
+        text_element_list = first_cell.getElementsByType(P)
+        if len(text_element_list) == 0 or len(text_element_list[0].childNodes) == 0:
             return False
 
-        content = textElementList[0].firstChild.data
+        content = text_element_list[0].firstChild.data
         print("found row: " + content)
 
         if not content and content.isdigit():
             return False
 
-        rowNumber = int(content)
-        if rowNumber > 0:
+        row_number = int(content)
+        if row_number > 0:
             return True
 
         return False
 
-    def __convertRowsToXml(self, rows):
+    def __convert_rows_to_xml(self, rows):
         xml = "<?xml version='1.0' encoding='UTF-8'?>\n" \
               "<items>"
 
         for row in rows:
-            rowAsXml = self.__convertRowToXml(row)
-            xml += "\n" + rowAsXml
+            row_as_xml = self.__convert_row_to_xml(row)
+            xml += "\n" + row_as_xml
 
         xml += "\n</items>"
 
         return xml
 
-    def __convertRowToXml(self, row):
-        offsetLp = 34+4
-        offsetAusbildung = offsetLp + 12 + 7
-        offsetVerfuegbarkeit = offsetAusbildung + 8 + 1
+    @staticmethod
+    def __convert_row_to_xml(row):
+        offset_lp = 34 + 4
+        offset_ausbildung = offset_lp + 12 + 7
+        offset_verfuegbarkeit = offset_ausbildung + 8 + 1
 
-        ids = {0:"Nummer", 2:"aktivUeber18", 3:"aktivUnter18", 4:"maennlich", 5:"weiblich",
-               7:"vereinAktiv", 9:"vereinPassiv", 11:"vereinFoerdernd",
-               14:"rang",15:"gruppe",
-               17:"nachname", 18:"vorname", 19:"strasse", 20:"hausnummer", 21:"plz", 22:"ort", 23:"geburtsdatum", 25:"telefon", 26:"mobil", 27: "email", 28: "infoPerMail", 29:"sonstigeErreichbarkeit",
-               33:"eintrittAktiv", 34:"endeAktiv",
-               offsetLp+1:"hl1", offsetLp+2:"hl2", offsetLp+3:"hl3", offsetLp+4: "hl4", offsetLp+5:"hl5", offsetLp+6:"hl6", offsetLp+7:"wa1", offsetLp+8:"wa2", offsetLp+9:"wa3", offsetLp+10:"wa4", offsetLp+11:"wa5", offsetLp+12:"wa6",
-               offsetAusbildung+1:"ausbildungGA", offsetAusbildung+2:"ausbildungTM", offsetAusbildung+3:"ausbildungGF", offsetAusbildung+4:"ausbildungZF", offsetAusbildung+5:"ausbildungVF", offsetAusbildung+6:"ausbildungFunk", offsetAusbildung+7:"ausbildungMA", offsetAusbildung+8:"ausbildungAT",
-               offsetVerfuegbarkeit+1:"verfWocheTag", offsetVerfuegbarkeit+3:"verfWocheNacht", offsetVerfuegbarkeit+5:"verfWochenendeTag", offsetVerfuegbarkeit+7:"verWochenendeNacht"}
+        ids = {2: "aktivUeber18", 3: "aktivUnter18", 4: "maennlich", 5: "weiblich",
+               7: "vereinAktiv", 9: "vereinPassiv", 11: "vereinFoerdernd",
+               14: "rang", 15: "gruppe",
+               17: "nachname", 18: "vorname", 19: "strasse", 20: "hausnummer", 21: "plz", 22: "ort", 23: "geburtsdatum",
+               25: "telefon", 26: "mobil", 27: "email", 28: "infoPerMail", 29: "sonstigeErreichbarkeit",
+               33: "eintrittAktiv", 34: "endeAktiv",
+               offset_lp + 1: "hl1", offset_lp + 2: "hl2", offset_lp + 3: "hl3", offset_lp + 4: "hl4", offset_lp + 5: "hl5",
+               offset_lp + 6: "hl6", offset_lp + 7: "wa1", offset_lp + 8: "wa2", offset_lp + 9: "wa3", offset_lp + 10: "wa4",
+               offset_lp + 11: "wa5", offset_lp + 12: "wa6",
+               offset_ausbildung + 1: "ausbildungGA", offset_ausbildung + 2: "ausbildungTM",
+               offset_ausbildung + 3: "ausbildungGF", offset_ausbildung + 4: "ausbildungZF",
+               offset_ausbildung + 5: "ausbildungVF", offset_ausbildung + 6: "ausbildungFunk",
+               offset_ausbildung + 7: "ausbildungMA", offset_ausbildung + 8: "ausbildungAT",
+               offset_verfuegbarkeit + 1: "verfWocheTag", offset_verfuegbarkeit + 3: "verfWocheNacht",
+               offset_verfuegbarkeit + 5: "verfWochenendeTag", offset_verfuegbarkeit + 7: "verWochenendeNacht"}
 
         xml = "    <item>\n"
 
-        idsAsList = ids.items()
+        ids_as_list = ids.items()
 
         cells = []
         for cell in row.childNodes:
             cells.append(cell)
 
             # if cell has a repeated attribute -> add it n-times
-            repeatAttr = cell.getAttribute('numbercolumnsrepeated') # auch: number-columns-spanned
-            if repeatAttr is not None:
-                strValue = str(repeatAttr)
+            repeat_attr = cell.getAttribute('numbercolumnsrepeated')  # auch: number-columns-spanned
+            if repeat_attr is not None:
+                str_value = str(repeat_attr)
 
-                if strValue.isdigit():
-                    value = int(strValue)
+                if str_value.isdigit():
+                    value = int(str_value)
 
                     for x in range(0, value - 1):
                         cells.append(cell)
 
-        for pair in idsAsList:
+        for pair in ids_as_list:
             index = pair[0]
             name = pair[1]
 
@@ -158,11 +166,11 @@ class OdfReader:
 
         self.__validate(ods)
 
-        table = self.__findStammlisteTable(ods)
-        assert(table is not None)
+        table = self.__find_stammliste_table(ods)
+        assert (table is not None)
 
-        rows = self.__getRelevantRows(table)
+        rows = self.__get_relevant_rows(table)
 
-        xml = self.__convertRowsToXml(rows)
+        xml = self.__convert_rows_to_xml(rows)
 
         return xml
